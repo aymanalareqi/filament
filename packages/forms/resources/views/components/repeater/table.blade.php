@@ -1,49 +1,47 @@
 @php
     use Filament\Actions\Action;
-        use Filament\Actions\ActionGroup;
-        use Filament\Support\Enums\Alignment;
-        use Filament\Support\Enums\VerticalAlignment;
-        use Illuminate\Support\Js;
-        use Illuminate\View\ComponentAttributeBag;
+    use Filament\Actions\ActionGroup;
+    use Filament\Support\Enums\Alignment;
+    use Filament\Support\Enums\VerticalAlignment;
+    use Illuminate\Support\Js;
+    use Illuminate\View\ComponentAttributeBag;
 
-        $fieldWrapperView = $getFieldWrapperView();
+    $fieldWrapperView = $getFieldWrapperView();
 
-        $items = $getItems();
+    $items = $getItems();
 
-        $addAction = $getAction($getAddActionName());
-        $addActionAlignment = $getAddActionAlignment();
-        $addBetweenAction = $getAction($getAddBetweenActionName());
-        $cloneAction = $getAction($getCloneActionName());
-        $deleteAction = $getAction($getDeleteActionName());
-        $moveDownAction = $getAction($getMoveDownActionName());
-        $moveUpAction = $getAction($getMoveUpActionName());
-        $reorderAction = $getAction($getReorderActionName());
-        $extraItemActions = $getExtraItemActions();
+    $addAction = $getAction($getAddActionName());
+    $addActionAlignment = $getAddActionAlignment();
+    $addBetweenAction = $getAction($getAddBetweenActionName());
+    $cloneAction = $getAction($getCloneActionName());
+    $deleteAction = $getAction($getDeleteActionName());
+    $moveDownAction = $getAction($getMoveDownActionName());
+    $moveUpAction = $getAction($getMoveUpActionName());
+    $reorderAction = $getAction($getReorderActionName());
+    $extraItemActions = $getExtraItemActions();
 
-        $isAddable = $isAddable();
-        $isCloneable = $isCloneable();
-        $isDeletable = $isDeletable();
-        $isReorderableWithButtons = $isReorderableWithButtons();
-        $isReorderableWithDragAndDrop = $isReorderableWithDragAndDrop();
+    $isAddable = $isAddable();
+    $isCloneable = $isCloneable();
+    $isDeletable = $isDeletable();
+    $isReorderableWithButtons = $isReorderableWithButtons();
+    $isReorderableWithDragAndDrop = $isReorderableWithDragAndDrop();
 
-        $key = $getKey();
-        $statePath = $getStatePath();
+    $key = $getKey();
+    $statePath = $getStatePath();
 
-        $tableColumns = $getTableColumns();
+    $tableColumns = $getTableColumns();
 
-        $isCompact = $isCompact();
+    $isCompact = $isCompact();
 @endphp
 
 <x-dynamic-component :component="$fieldWrapperView" :field="$field">
     <div
-        {{
-            $attributes
-            ->merge($getExtraAttributes(), escape: false)
-            ->class([
-            'fi-fo-table-repeater',
-            'fi-compact' => $isCompact,
-            ])
-        }}
+        {{ $attributes
+                ->merge($getExtraAttributes(), escape: false)
+                ->class([
+                    'fi-fo-table-repeater',
+                    'fi-compact' => $isCompact,
+                ]) }}
     >
         @if (count($items))
             <table>
@@ -58,11 +56,11 @@
                         @foreach ($tableColumns as $column)
                             <th
                                 @class([
-                                'fi-wrapped' => $column->canHeaderWrap(),
-                                (($columnAlignment = $column->getAlignment()) instanceof Alignment) ? ('fi-align-' . $columnAlignment->value) : $columnAlignment,
+                                    'fi-wrapped' => $column->canHeaderWrap(),
+                                    (($columnAlignment = $column->getAlignment()) instanceof Alignment) ? ('fi-align-' . $columnAlignment->value) : $columnAlignment,
                                 ])
                                 @style([
-                                ('width: ' . ($columnWidth = $column->getWidth())) => filled($columnWidth),
+                                    ('width: ' . ($columnWidth = $column->getWidth())) => filled($columnWidth),
                                 ])
                             >
                                 @if (! $column->isHeaderLabelHidden())
@@ -86,30 +84,28 @@
 
                 <tbody
                     x-sortable
-                    {{
-                        (new ComponentAttributeBag)
-                        ->merge([
-                        'data-sortable-animation-duration' => $getReorderAnimationDuration(),
-                        'x-on:end.stop' => '$wire.mountAction(\'reorder\', { items: $event.target.sortable.toArray() }, { schemaComponent: \'' . $key . '\' })',
-                        ], escape: false)
-                    }}
+                    {{ (new ComponentAttributeBag)
+                            ->merge([
+                                'data-sortable-animation-duration' => $getReorderAnimationDuration(),
+                                'x-on:end.stop' => '$wire.mountAction(\'reorder\', { items: $event.target.sortable.toArray() }, { schemaComponent: \'' . $key . '\' })',
+                            ], escape: false) }}
                 >
                     @foreach ($items as $itemKey => $item)
                         @php
                             $visibleExtraItemActions = array_filter(
-                                                            $extraItemActions,
-                                                            fn (Action $action): bool => $action(['item' => $itemKey])->isVisible(),
-                                                        );
-                                                        $cloneAction = $cloneAction(['item' => $itemKey]);
-                                                        $cloneActionIsVisible = $isCloneable && $cloneAction->isVisible();
-                                                        $deleteAction = $deleteAction(['item' => $itemKey]);
-                                                        $deleteActionIsVisible = $isDeletable && $deleteAction->isVisible();
-                                                        $moveDownAction = $moveDownAction(['item' => $itemKey])->disabled($loop->last);
-                                                        $moveDownActionIsVisible = $isReorderableWithButtons && $moveDownAction->isVisible();
-                                                        $moveUpAction = $moveUpAction(['item' => $itemKey])->disabled($loop->first);
-                                                        $moveUpActionIsVisible = $isReorderableWithButtons && $moveUpAction->isVisible();
-                                                        $reorderActionIsVisible = $isReorderableWithDragAndDrop && $reorderAction->isVisible();
-                                                        $itemStatePath = $item->getStatePath();
+                                $extraItemActions,
+                                fn (Action $action): bool => $action(['item' => $itemKey])->isVisible(),
+                            );
+                            $cloneAction = $cloneAction(['item' => $itemKey]);
+                            $cloneActionIsVisible = $isCloneable && $cloneAction->isVisible();
+                            $deleteAction = $deleteAction(['item' => $itemKey]);
+                            $deleteActionIsVisible = $isDeletable && $deleteAction->isVisible();
+                            $moveDownAction = $moveDownAction(['item' => $itemKey])->disabled($loop->last);
+                            $moveDownActionIsVisible = $isReorderableWithButtons && $moveDownAction->isVisible();
+                            $moveUpAction = $moveUpAction(['item' => $itemKey])->disabled($loop->first);
+                            $moveUpActionIsVisible = $isReorderableWithButtons && $moveUpAction->isVisible();
+                            $reorderActionIsVisible = $isReorderableWithDragAndDrop && $reorderAction->isVisible();
+                            $itemStatePath = $item->getStatePath();
                         @endphp
 
                         <tr
@@ -149,9 +145,9 @@
                             @foreach ($item->getComponents(withHidden: true) as $schemaComponent)
                                 @php
                                     throw_unless(
-                                                                            $schemaComponent instanceof \Filament\Schemas\Components\Component,
-                                                                            new \Exception('Table repeaters must only contain schema components, but [' . $schemaComponent::class . '] was used.'),
-                                                                        );
+                                        $schemaComponent instanceof \Filament\Schemas\Components\Component,
+                                        new \Exception('Table repeaters must only contain schema components, but [' . $schemaComponent::class . '] was used.'),
+                                    );
                                 @endphp
 
                                 @if (count($tableColumns) > $counter)
@@ -165,12 +161,12 @@
                                         @if ($schemaComponent->isVisible())
                                             @php
                                                 $currentColumn = $tableColumns[$counter - 1] ?? null;
-                                                                                                $columnVerticalAlignment = $currentColumn?->getVerticalAlignment();
+                                                $columnVerticalAlignment = $currentColumn?->getVerticalAlignment();
                                             @endphp
 
                                             <td
                                                 @class([
-                                                ($columnVerticalAlignment instanceof VerticalAlignment) ? ('fi-vertical-align-' . $columnVerticalAlignment->value) : (is_string($columnVerticalAlignment) ? $columnVerticalAlignment : ''),
+                                                    ($columnVerticalAlignment instanceof VerticalAlignment) ? ('fi-vertical-align-' . $columnVerticalAlignment->value) : (is_string($columnVerticalAlignment) ? $columnVerticalAlignment : ''),
                                                 ])
                                             >
                                                 {!! $schemaComponent->toSchemaHtml() !!}
@@ -218,8 +214,8 @@
         @if ($isAddable && $addAction->isVisible())
             <div
                 @class([
-                'fi-fo-table-repeater-add',
-                ($addActionAlignment instanceof Alignment) ? ('fi-align-' . $addActionAlignment->value) : $addActionAlignment,
+                    'fi-fo-table-repeater-add',
+                    ($addActionAlignment instanceof Alignment) ? ('fi-align-' . $addActionAlignment->value) : $addActionAlignment,
                 ])
             >
                 {{ $addAction }}
